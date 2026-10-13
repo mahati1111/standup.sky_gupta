@@ -1,0 +1,62 @@
+export const shows = [
+  {
+    id: "sample-delhi-2026-11-07",
+    city: "New Delhi",
+    venue: "The Comedy Room",
+    dateTime: "2026-11-07T14:00:00.000Z",
+    dateLabel: "Saturday, Nov 7 · 7:30 PM",
+    priceFrom: 799,
+    currency: "INR",
+    isSample: true,
+  },
+  {
+    id: "sample-bengaluru-2026-11-21",
+    city: "Bengaluru",
+    venue: "The Laugh House",
+    dateTime: "2026-11-21T14:00:00.000Z",
+    dateLabel: "Saturday, Nov 21 · 7:30 PM",
+    priceFrom: 999,
+    currency: "INR",
+    isSample: true,
+  },
+  {
+    id: "sample-mumbai-2026-12-05",
+    city: "Mumbai",
+    venue: "The Comedy Room",
+    dateTime: "2026-12-05T14:00:00.000Z",
+    dateLabel: "Saturday, Dec 5 · 7:30 PM",
+    priceFrom: 999,
+    currency: "INR",
+    isSample: true,
+  },
+];
+
+export const merch = [
+  {
+    id: "front-row-energy-tee",
+    name: "Front Row Energy Tee",
+    description: "A concept tee for people who laugh before the punchline lands.",
+    price: 899,
+    currency: "INR",
+    category: "T-shirt",
+    image: "",
+  },
+  {
+    id: "laugh-later-cap",
+    name: "Laugh Later Cap",
+    description: "A mock merch design for the audience member still quoting the set.",
+    price: 699,
+    currency: "INR",
+    category: "Cap",
+    image: "",
+  },
+  {
+    id: "emergency-punchline-mug",
+    name: "Emergency Punchline Mug",
+    description: "A sample mug concept for your very serious post-show debrief.",
+    price: 499,
+    currency: "INR",
+    category: "Mug",
+    image: "",
+  },
+];

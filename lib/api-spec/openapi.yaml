@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: fan-site
+    description: Public show, merchandise, community, booking request, and chat operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,108 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /shows:
+    get:
+      operationId: listShows
+      tags: [fan-site]
+      summary: List upcoming show listings
+      responses:
+        "200":
+          description: Show listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Show"
+  /merch:
+    get:
+      operationId: listMerch
+      tags: [fan-site]
+      summary: List merchandise
+      responses:
+        "200":
+          description: Merchandise catalog
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MerchItem"
+  /community/posts:
+    get:
+      operationId: listCommunityPosts
+      tags: [fan-site]
+      summary: List recent community posts
+      responses:
+        "200":
+          description: Recent community posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommunityPost"
+    post:
+      operationId: createCommunityPost
+      tags: [fan-site]
+      summary: Share a community post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommunityPostInput"
+      responses:
+        "201":
+          description: Community post created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommunityPost"
+  /bookings:
+    post:
+      operationId: createBookingRequest
+      tags: [fan-site]
+      summary: Save a sample booking request
+      description: Stores an unpaid request for a sample listing. It does not issue tickets or charge the visitor.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookingRequestInput"
+      responses:
+        "201":
+          description: Booking request recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookingRequest"
+  /chat:
+    post:
+      operationId: sendChatMessage
+      tags: [fan-site]
+      summary: Send a message to the conversational fan assistant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatTurnInput"
+      responses:
+        "200":
+          description: Assistant reply and optional matched show
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatTurnReply"
+        "502":
+          description: Assistant is temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +137,92 @@ components:
           type: string
       required:
         - status
+    Show:
+      type: object
+      required: [id, city, venue, dateTime, dateLabel, priceFrom, currency, isSample]
+      properties:
+        id: { type: string }
+        city: { type: string }
+        venue: { type: string }
+        dateTime: { type: string, format: date-time }
+        dateLabel: { type: string }
+        priceFrom: { type: integer }
+        currency: { type: string }
+        isSample: { type: boolean }
+    MerchItem:
+      type: object
+      required: [id, name, description, price, currency, category, image]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: string }
+        price: { type: integer }
+        currency: { type: string }
+        category: { type: string }
+        image: { type: string }
+    CommunityPost:
+      type: object
+      required: [id, author, message, createdAt]
+      properties:
+        id: { type: string }
+        author: { type: string }
+        message: { type: string }
+        createdAt: { type: string, format: date-time }
+    CommunityPostInput:
+      type: object
+      required: [author, message]
+      properties:
+        author: { type: string, minLength: 1, maxLength: 40 }
+        message: { type: string, minLength: 1, maxLength: 400 }
+    BookingRequestInput:
+      type: object
+      required: [showId, name, email, quantity]
+      properties:
+        showId: { type: string }
+        name: { type: string, minLength: 1, maxLength: 100 }
+        email: { type: string, format: email, maxLength: 254 }
+        quantity: { type: integer, minimum: 1, maximum: 8 }
+    BookingRequest:
+      type: object
+      required: [id, showId, name, email, quantity, total, currency, status, paid, message]
+      properties:
+        id: { type: string }
+        showId: { type: string }
+        name: { type: string }
+        email: { type: string }
+        quantity: { type: integer }
+        total: { type: integer }
+        currency: { type: string }
+        status: { type: string, enum: [sample_request] }
+        paid: { type: boolean }
+        message: { type: string }
+    ChatHistoryMessage:
+      type: object
+      required: [role, content]
+      properties:
+        role: { type: string, enum: [user, assistant] }
+        content: { type: string, maxLength: 2000 }
+    ChatTurnInput:
+      type: object
+      required: [message, history]
+      properties:
+        message: { type: string, minLength: 1, maxLength: 2000 }
+        history:
+          type: array
+          maxItems: 20
+          items:
+            $ref: "#/components/schemas/ChatHistoryMessage"
+        persona: { type: ["string", "null"], maxLength: 80 }
+    ChatTurnReply:
+      type: object
+      required: [reply, bookingReady, showId]
+      properties:
+        reply: { type: string }
+        bookingReady: { type: boolean }
+        showId: { type: ["string", "null"] }
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error: { type: string }
 
