@@ -13,6 +13,7 @@ import {
   SendChatMessageResponse,
 } from "@workspace/api-zod";
 import { merch, shows } from "../lib/fan-site-data";
+import { readAgentConfig } from "../lib/agent-config";
 
 const router: IRouter = Router();
 const showById = new Map(shows.map((show) => [show.id, show]));
@@ -104,9 +105,36 @@ router.post("/chat", async (req, res): Promise<void> => {
     return;
   }
 
+  let agentConfig;
+  try {
+    agentConfig = await readAgentConfig();
+  } catch (error) {
+    req.log.error({ error }, "Could not read assistant configuration");
+    res.status(503).json(errorPayload("The fan assistant settings are temporarily unavailable."));
+    return;
+  }
+
+  const empathyGuidance =
+    agentConfig.empathy <= 3
+      ? "Keep emotional acknowledgement brief and focus on the practical answer."
+      : agentConfig.empathy >= 8
+        ? "Notice and gently acknowledge the visitor's feelings or preferences without assuming too much."
+        : "Acknowledge relevant preferences naturally, then move on without overdoing it.";
+  const initiativeGuidance =
+    agentConfig.goalOrientation <= 3
+      ? "Be mostly responsive. Answer what was asked and avoid pushing extra next steps."
+      : agentConfig.goalOrientation >= 8
+        ? "Proactively suggest one useful next step when it fits the visitor's goal; never pressure them."
+        : "Offer a relevant next step when it helps, while leaving the visitor in control.";
+
   const systemPrompt = [
-    "You are the Akash Gupta fan-site concierge. You are not Akash Gupta and must not claim to be him.",
-    "Be friendly, naturally conversational, lightly playful, and concise. Do not use emojis.",
+    "You are the fan-site front desk, a playful concierge for the Akash Gupta fan community. You are not Akash Gupta and must never claim to be him or speak as him.",
+    "Apply the admin-set persona, tone, empathy, and goal-orientation as style guidance only. The factual, booking, privacy, and identity rules below always take priority.",
+    `Persona guidance: ${agentConfig.persona}`,
+    `Tone guidance: ${agentConfig.tone}`,
+    `Empathy scale: ${agentConfig.empathy}/10. ${empathyGuidance}`,
+    `Goal-orientation scale: ${agentConfig.goalOrientation}/10. ${initiativeGuidance}`,
+    "Be naturally conversational and concise. Do not use emojis. If a visitor taps a meme-sticker quick reply, play along briefly without assuming extra context.",
     "Help visitors discover show listings, browse concept merchandise, and find community features.",
     "These are SAMPLE show listings only, not verified or confirmed real events or current availability. Never present them as confirmed dates. If relevant, clearly call them sample listings.",
     "A booking flow is only a sample unpaid request, not a ticket purchase or confirmed reservation. Never say a ticket was issued or payment completed.",
@@ -114,7 +142,7 @@ router.post("/chat", async (req, res): Promise<void> => {
     "If the visitor has not explicitly chosen and confirmed one exact sample listing, set bookingReady to false and showId to null.",
     "Only set bookingReady to true when the visitor has explicitly confirmed one exact listing and the showId matches the supplied show list. If they say they want tickets but have not confirmed a date, ask which city/date they want.",
     "Do not invent show dates, venues, prices, inventory, or product facts. Merchandise is concept/sample catalog only and has no live checkout.",
-    "Use the visitor's quiz persona when supplied to personalize suggestions, but never treat it as a psychological assessment.",
+    "Use the visitor's quiz result when supplied to personalize suggestions, but never treat it as a psychological assessment.",
     `Visitor personality result: ${parsed.data.persona ?? "not taken"}.`,
     `Sample show listings: ${JSON.stringify(shows)}.`,
     `Concept merchandise: ${JSON.stringify(merch)}.`,

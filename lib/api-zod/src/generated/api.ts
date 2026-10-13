@@ -144,3 +144,105 @@ export const SendChatMessageResponse = zod.object({
 })
 
 
+/**
+ * @summary Check whether the current browser has an admin session
+ */
+export const GetAdminSessionResponse = zod.object({
+  "configured": zod.boolean(),
+  "authenticated": zod.boolean()
+})
+
+
+/**
+ * @summary Start a protected admin session
+ */
+export const adminLoginBodyPassphraseMax = 256;
+
+
+
+export const AdminLoginBody = zod.object({
+  "passphrase": zod.string().min(1).max(adminLoginBodyPassphraseMax)
+})
+
+export const AdminLoginResponse = zod.object({
+  "configured": zod.boolean(),
+  "authenticated": zod.boolean()
+})
+
+
+/**
+ * @summary End the current admin session
+ */
+export const AdminLogoutResponse = zod.object({
+  "configured": zod.boolean(),
+  "authenticated": zod.boolean()
+})
+
+
+/**
+ * @summary Read the assistant behavior settings
+ */
+export const getAgentConfigResponsePersonaMax = 500;
+
+export const getAgentConfigResponseToneMax = 200;
+
+export const getAgentConfigResponseEmpathyMin = 0;
+export const getAgentConfigResponseEmpathyMax = 10;
+
+export const getAgentConfigResponseGoalOrientationMin = 0;
+export const getAgentConfigResponseGoalOrientationMax = 10;
+
+
+
+export const GetAgentConfigResponse = zod.object({
+  "persona": zod.string().min(1).max(getAgentConfigResponsePersonaMax),
+  "tone": zod.string().min(1).max(getAgentConfigResponseToneMax),
+  "empathy": zod.number().int().min(getAgentConfigResponseEmpathyMin).max(getAgentConfigResponseEmpathyMax),
+  "goalOrientation": zod.number().int().min(getAgentConfigResponseGoalOrientationMin).max(getAgentConfigResponseGoalOrientationMax),
+  "updatedAt": zod.coerce.date().nullable()
+})
+
+
+/**
+ * @summary Save assistant behavior settings
+ */
+export const updateAgentConfigBodyPersonaMax = 500;
+
+export const updateAgentConfigBodyToneMax = 200;
+
+export const updateAgentConfigBodyEmpathyMin = 0;
+export const updateAgentConfigBodyEmpathyMax = 10;
+
+export const updateAgentConfigBodyGoalOrientationMin = 0;
+export const updateAgentConfigBodyGoalOrientationMax = 10;
+
+
+
+export const UpdateAgentConfigBody = zod.object({
+  "persona": zod.string().min(1).max(updateAgentConfigBodyPersonaMax),
+  "tone": zod.string().min(1).max(updateAgentConfigBodyToneMax),
+  "empathy": zod.number().int().min(updateAgentConfigBodyEmpathyMin).max(updateAgentConfigBodyEmpathyMax),
+  "goalOrientation": zod.number().int().min(updateAgentConfigBodyGoalOrientationMin).max(updateAgentConfigBodyGoalOrientationMax)
+})
+
+export const updateAgentConfigResponsePersonaMax = 500;
+
+export const updateAgentConfigResponseToneMax = 200;
+
+export const updateAgentConfigResponseEmpathyMin = 0;
+export const updateAgentConfigResponseEmpathyMax = 10;
+
+export const updateAgentConfigResponseGoalOrientationMin = 0;
+export const updateAgentConfigResponseGoalOrientationMax = 10;
+
+
+
+export const UpdateAgentConfigResponse = zod.object({
+  "persona": zod.string().min(1).max(updateAgentConfigResponsePersonaMax),
+  "tone": zod.string().min(1).max(updateAgentConfigResponseToneMax),
+  "empathy": zod.number().int().min(updateAgentConfigResponseEmpathyMin).max(updateAgentConfigResponseEmpathyMax),
+  "goalOrientation": zod.number().int().min(updateAgentConfigResponseGoalOrientationMin).max(updateAgentConfigResponseGoalOrientationMax),
+  "updatedAt": zod.coerce.date().nullable()
+})
+
+

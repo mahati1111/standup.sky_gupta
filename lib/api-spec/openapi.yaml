@@ -12,6 +12,8 @@ tags:
     description: Health operations
   - name: fan-site
     description: Public show, merchandise, community, booking request, and chat operations
+  - name: admin
+    description: Private controls for the conversational fan assistant
 paths:
   /healthz:
     get:
@@ -128,6 +130,113 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /admin/session:
+    get:
+      operationId: getAdminSession
+      tags: [admin]
+      summary: Check whether the current browser has an admin session
+      responses:
+        "200":
+          description: Admin session status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSession"
+  /admin/login:
+    post:
+      operationId: adminLogin
+      tags: [admin]
+      summary: Start a protected admin session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminLoginInput"
+      responses:
+        "200":
+          description: Admin session started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSession"
+        "401":
+          description: The passphrase was not accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Too many sign-in attempts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Admin access is not configured
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/logout:
+    post:
+      operationId: adminLogout
+      tags: [admin]
+      summary: End the current admin session
+      responses:
+        "200":
+          description: Admin session ended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSession"
+  /admin/agent-config:
+    get:
+      operationId: getAgentConfig
+      tags: [admin]
+      summary: Read the assistant behavior settings
+      responses:
+        "200":
+          description: Assistant behavior settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAgentConfig"
+        "401":
+          description: Admin sign-in required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: updateAgentConfig
+      tags: [admin]
+      summary: Save assistant behavior settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminAgentConfigInput"
+      responses:
+        "200":
+          description: Updated assistant behavior settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAgentConfig"
+        "400":
+          description: Settings are invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Admin sign-in required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -220,6 +329,34 @@ components:
         reply: { type: string }
         bookingReady: { type: boolean }
         showId: { type: ["string", "null"] }
+    AdminSession:
+      type: object
+      required: [configured, authenticated]
+      properties:
+        configured: { type: boolean }
+        authenticated: { type: boolean }
+    AdminLoginInput:
+      type: object
+      required: [passphrase]
+      properties:
+        passphrase: { type: string, minLength: 1, maxLength: 256 }
+    AdminAgentConfig:
+      type: object
+      required: [persona, tone, empathy, goalOrientation, updatedAt]
+      properties:
+        persona: { type: string, minLength: 1, maxLength: 500 }
+        tone: { type: string, minLength: 1, maxLength: 200 }
+        empathy: { type: integer, minimum: 0, maximum: 10 }
+        goalOrientation: { type: integer, minimum: 0, maximum: 10 }
+        updatedAt: { type: ["string", "null"], format: date-time }
+    AdminAgentConfigInput:
+      type: object
+      required: [persona, tone, empathy, goalOrientation]
+      properties:
+        persona: { type: string, minLength: 1, maxLength: 500 }
+        tone: { type: string, minLength: 1, maxLength: 200 }
+        empathy: { type: integer, minimum: 0, maximum: 10 }
+        goalOrientation: { type: integer, minimum: 0, maximum: 10 }
     ErrorResponse:
       type: object
       required: [error]

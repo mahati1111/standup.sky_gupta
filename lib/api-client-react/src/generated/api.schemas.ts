@@ -122,6 +122,67 @@ export interface ChatTurnReply {
   showId: string | null;
 }
 
+export interface AdminSession {
+  configured: boolean;
+  authenticated: boolean;
+}
+
+export interface AdminLoginInput {
+  /**
+     * @minLength 1
+     * @maxLength 256
+     */
+  passphrase: string;
+}
+
+export interface AdminAgentConfig {
+  /**
+     * @minLength 1
+     * @maxLength 500
+     */
+  persona: string;
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  tone: string;
+  /**
+     * @minimum 0
+     * @maximum 10
+     */
+  empathy: number;
+  /**
+     * @minimum 0
+     * @maximum 10
+     */
+  goalOrientation: number;
+  /** @nullable */
+  updatedAt: string | null;
+}
+
+export interface AdminAgentConfigInput {
+  /**
+     * @minLength 1
+     * @maxLength 500
+     */
+  persona: string;
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  tone: string;
+  /**
+     * @minimum 0
+     * @maximum 10
+     */
+  empathy: number;
+  /**
+     * @minimum 0
+     * @maximum 10
+     */
+  goalOrientation: number;
+}
+
 export interface ErrorResponse {
   error: string;
 }
