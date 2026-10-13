@@ -439,6 +439,161 @@
   animation-delay: 220ms;
 }
 
+.front-desk-launcher {
+  position: fixed;
+  z-index: 55;
+  right: clamp(16px, 3vw, 34px);
+  bottom: clamp(16px, 3vw, 30px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  animation: front-desk-arrive 620ms cubic-bezier(.2,.75,.25,1) 280ms both;
+}
+
+.front-desk-cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 220px;
+  border: 1px solid color-mix(in srgb, var(--theme-ink) 16%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--theme-paper) 96%, white);
+  padding: 9px 13px;
+  color: var(--theme-ink);
+  font-family: var(--app-font-mono);
+  font-size: 10px;
+  letter-spacing: .015em;
+  box-shadow: 0 8px 24px -15px color-mix(in srgb, var(--theme-ink) 65%, transparent);
+  animation: front-desk-cue-enter 420ms ease-out 760ms both, front-desk-cue-leave 280ms ease-in 5.6s forwards;
+}
+
+.front-desk-cue::before {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 6px;
+  border-radius: 999px;
+  background: var(--theme-accent);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--theme-accent) 34%, transparent);
+  content: "";
+  animation: front-desk-cue-pulse 1.8s ease-out 1s 2;
+}
+
+.front-desk-launch-button {
+  position: relative;
+  display: inline-flex;
+  min-height: 56px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid color-mix(in srgb, var(--theme-paper) 46%, transparent);
+  border-radius: 999px;
+  background: var(--theme-accent);
+  padding: 0 20px;
+  color: var(--theme-paper);
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 12px 30px -12px color-mix(in srgb, var(--theme-ink) 65%, transparent);
+  transition: transform 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+  cursor: pointer;
+}
+
+.front-desk-launch-button::before {
+  position: absolute;
+  z-index: 0;
+  inset: -5px;
+  border: 1px solid color-mix(in srgb, var(--theme-spot) 75%, transparent);
+  border-radius: inherit;
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  animation: front-desk-ring 1.9s ease-out 940ms 2;
+}
+
+.front-desk-launch-button > * {
+  position: relative;
+  z-index: 1;
+}
+
+.front-desk-launch-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px -12px color-mix(in srgb, var(--theme-ink) 70%, transparent);
+}
+
+.front-desk-launch-button:focus-visible,
+.front-desk-panel button:focus-visible,
+.front-desk-panel input:focus-visible,
+.front-desk-panel select:focus-visible {
+  outline: 3px solid var(--theme-spot);
+  outline-offset: 3px;
+}
+
+.front-desk-panel {
+  position: fixed;
+  z-index: 54;
+  right: clamp(16px, 3vw, 34px);
+  bottom: 101px;
+  width: min(440px, calc(100vw - 32px));
+  max-height: min(720px, calc(100dvh - 124px));
+  overflow-y: auto;
+  border-radius: 1.35rem;
+  animation: front-desk-arrive 220ms cubic-bezier(.2,.75,.25,1) both;
+  overscroll-behavior: contain;
+}
+
+@keyframes front-desk-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes front-desk-cue-enter {
+  from {
+    opacity: 0;
+    transform: translateY(5px) scale(.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes front-desk-cue-leave {
+  to {
+    opacity: 0;
+    transform: translateY(4px) scale(.98);
+  }
+}
+
+@keyframes front-desk-cue-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--theme-accent) 34%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 7px transparent;
+  }
+}
+
+@keyframes front-desk-ring {
+  0% {
+    opacity: .55;
+    transform: scale(.91);
+  }
+  85% {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+}
+
 .marquee-track {
   animation: marquee 28s linear infinite;
 }
@@ -479,5 +634,29 @@
 @media (max-width: 640px) {
   .wrap {
     width: min(100% - 32px, 1160px);
+  }
+
+  .front-desk-launcher {
+    right: 12px;
+    bottom: 12px;
+    right: max(12px, env(safe-area-inset-right));
+    bottom: max(12px, env(safe-area-inset-bottom));
+  }
+
+  .front-desk-cue {
+    max-width: 190px;
+    font-size: 9px;
+  }
+
+  .front-desk-launch-button {
+    min-height: 52px;
+    padding-inline: 17px;
+  }
+
+  .front-desk-panel {
+    right: 8px;
+    bottom: 76px;
+    width: calc(100vw - 16px);
+    max-height: calc(100dvh - 88px);
   }
 }
