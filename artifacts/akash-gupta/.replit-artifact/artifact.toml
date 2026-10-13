@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Akash Gupta Live"
+description = "An expressive fan website for comedian Akash Gupta, featuring an optional swipeable personality quiz, conversational show-booking assistant, upcoming show dates, merch recommendations, and a community area."
+version = "1.0.0"
+id = "artifacts/akash-gupta"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20380
+
+[services.development]
+run = "pnpm --filter @workspace/akash-gupta run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/akash-gupta", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/akash-gupta/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20380"
+BASE_PATH = "/"
